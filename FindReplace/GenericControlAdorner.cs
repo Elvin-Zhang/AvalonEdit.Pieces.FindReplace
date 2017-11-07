@@ -8,10 +8,10 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace CodeRunner.TextEditing
+namespace FindReplace
 {
     // original from: http://www.nbdtech.com/Blog/archive/2010/06/28/wpf-adorners-part-2-ndash-placing-any-control-on-the.aspx
-    class GenericControlAdorner : Adorner
+    public class GenericControlAdorner : Adorner
     {
         private Control _child;
 

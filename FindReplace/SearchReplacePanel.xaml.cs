@@ -23,7 +23,7 @@ using Localization = ICSharpCode.AvalonEdit.Search.Localization;
 
 
 
-namespace CodeRunner.TextEditing
+namespace FindReplace
 {
     // original from: https://github.com/aelij/RoslynPad/blob/master/src/RoslynPad.Editor.Windows/SearchReplacePanel.cs
 

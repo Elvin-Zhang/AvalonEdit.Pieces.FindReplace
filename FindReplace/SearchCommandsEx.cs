@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace CodeRunner.TextEditing
+namespace FindReplace
 {
     // original from: https://github.com/aelij/RoslynPad/blob/master/src/RoslynPad.Editor.Windows/SearchReplacePanel.cs
-    public static class SearchCommandsEx
+    static class SearchCommandsEx
     {
         /// <summary>Replaces the next occurrence in the document.</summary>
         public static readonly RoutedCommand ReplaceNext = new RoutedCommand("ReplaceNext", typeof(SearchReplacePanel),
