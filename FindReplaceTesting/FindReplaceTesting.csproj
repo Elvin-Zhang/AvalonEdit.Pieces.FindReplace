@@ -3,14 +3,13 @@
   http://www.natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/
   -->
   <PropertyGroup>
+    <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
 
 
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-    <Page Remove="AvalonTestPieces\TestHost.xaml" />
-    <Page Remove="AvalonTestPieces\TestTextEditor.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
   </ItemGroup>
   
@@ -20,6 +19,12 @@
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
     <PackageReference Include="AvalonEdit" Version="5.0.4" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+  
+  
+  <ItemGroup>
+    <ProjectReference Include="..\FindReplace\FindReplace.csproj" />
   </ItemGroup>
 
 

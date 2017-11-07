@@ -11,7 +11,7 @@
             <TextBlock Text="Editor" />
         </StackPanel>
 
-        <local:TestTextEditor x:Name="programInputTextEditor"
+        <local:TestTextEditor x:Name="textEditor"
                                                                    DockPanel.Dock="Bottom"
                                                                    FontFamily="Consolas"
                                                                    FontSize="10pt"
