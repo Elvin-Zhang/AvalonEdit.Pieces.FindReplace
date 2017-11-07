@@ -28,5 +28,12 @@ namespace FindReplaceTesting.AvalonTestPieces
             InitializeComponent();
 
         }
+
+        private void TextEditor_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }
