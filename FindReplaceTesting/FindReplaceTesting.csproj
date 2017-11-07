@@ -5,10 +5,31 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
+
+
+  <ItemGroup>
+    <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+    <Page Remove="AvalonTestPieces\TestHost.xaml" />
+    <Page Remove="AvalonTestPieces\TestTextEditor.xaml" />
+    <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
+  </ItemGroup>
+  
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
+    <PackageReference Include="AvalonEdit" Version="5.0.4" />
+  </ItemGroup>
+
+
+  <!-- wpf references
+  -->
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
 
 </Project>
