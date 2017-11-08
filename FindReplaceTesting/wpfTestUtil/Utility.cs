@@ -65,6 +65,10 @@ namespace FindReplaceTesting.wpfTestUtil
 
 
                 }
+                catch(ThreadAbortException ex)
+                {
+                    // ignore
+                }
                 catch (Exception ex)
                 {
                     promise.SetResult(new RunResult
