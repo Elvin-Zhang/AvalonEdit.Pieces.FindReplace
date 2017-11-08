@@ -14,6 +14,7 @@ namespace FindReplaceTesting
     public class UnitTest1
     {
 
+        // here is some info on OnApplyTemplate: https://charlass.wordpress.com/2012/02/17/wpf-onapplytemplate-is-not-getting-called/
 
 
         [TestMethod]
