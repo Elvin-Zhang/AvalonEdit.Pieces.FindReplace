@@ -1,45 +1,30 @@
-﻿using ICSharpCode.AvalonEdit;
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Rendering;
 using ICSharpCode.AvalonEdit.Search;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+using ICSharpCode.AvalonEdit;
 using Localization = ICSharpCode.AvalonEdit.Search.Localization;
-
-
 
 namespace FindReplace
 {
-    // original from: https://github.com/aelij/RoslynPad/blob/master/src/RoslynPad.Editor.Windows/SearchReplacePanel.cs
-
-
-    /// <summary>
-    /// Interaction logic for SearchReplacePanel.xaml
-    /// </summary>
-    public partial class SearchReplacePanel : UserControl
+    public class SearchReplacePanel : Control
     {
         private TextArea _textArea;
         private SearchReplaceInputHandler _handler;
         private TextDocument _currentDocument;
         private SearchReplaceResultBackgroundRenderer _renderer;
         private TextBox _searchTextBox;
-        //private SearchReplacePanelAdorner _adorner;
-        private GenericControlAdorner _adorner;
+        private SearchReplacePanelAdorner _adorner;
         private ISearchStrategy _strategy;
 
         private ToolTip _messageView = new ToolTip { Placement = PlacementMode.Bottom, StaysOpen = true, Focusable = false };
@@ -179,16 +164,8 @@ namespace FindReplace
         /// <summary>
         /// Creates a new SearchReplacePanel.
         /// </summary>
-        public SearchReplacePanel(TextArea __textArea)
+        SearchReplacePanel()
         {
-            InitializeComponent();
-           
-            _searchTextBox = this.FindName("PART_searchTextBox") as TextBox;
-            this._textArea = __textArea;
-
-            this.AttachInternal();
-            this._handler = new SearchReplaceInputHandler(this._textArea, this);
-            this._textArea.DefaultInputHandler.NestedInputHandlers.Add(this._handler);
         }
 
         /// <summary>
@@ -208,22 +185,17 @@ namespace FindReplace
             _textArea.DefaultInputHandler.NestedInputHandlers.Remove(_handler);
         }
 
-        void AttachInternal()
+        void AttachInternal(TextArea textArea)
         {
-            //_adorner = new SearchReplacePanelAdorner(textArea, this);
-
-            _adorner = new GenericControlAdorner(_textArea)
-            {
-                Child = this
-            };
-
+            _textArea = textArea;
+            _adorner = new SearchReplacePanelAdorner(textArea, this);
             DataContext = this;
 
             _renderer = new SearchReplaceResultBackgroundRenderer();
-            _currentDocument = this._textArea.Document;
+            _currentDocument = textArea.Document;
             if (_currentDocument != null)
                 _currentDocument.TextChanged += TextArea_Document_TextChanged;
-            this._textArea.DocumentChanged += TextArea_DocumentChanged;
+            textArea.DocumentChanged += TextArea_DocumentChanged;
             KeyDown += SearchLayerKeyDown;
 
             CommandBindings.Add(new CommandBinding(SearchCommands.FindNext, (sender, e) => FindNext()));
@@ -259,6 +231,12 @@ namespace FindReplace
             DoSearch(false);
         }
 
+        /// <inheritdoc/>
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _searchTextBox = Template.FindName("PART_searchTextBox", this) as TextBox;
+        }
 
         void ValidateSearchText()
         {
@@ -432,13 +410,9 @@ namespace FindReplace
         public void Open()
         {
             if (!IsClosed) return;
-
             var layer = AdornerLayer.GetAdornerLayer(_textArea);
             if (layer != null)
-            {
                 layer.Add(_adorner);
-            }
-                
             _textArea.TextView.BackgroundRenderers.Add(_renderer);
             IsClosed = false;
             DoSearch(false);
@@ -492,8 +466,10 @@ namespace FindReplace
         {
             if (textArea == null)
                 throw new ArgumentNullException(nameof(textArea));
-            var panel = new SearchReplacePanel(textArea);
-
+            var panel = new SearchReplacePanel { _textArea = textArea };
+            panel.AttachInternal(textArea);
+            panel._handler = new SearchReplaceInputHandler(textArea, panel);
+            textArea.DefaultInputHandler.NestedInputHandlers.Add(panel._handler);
             return panel;
         }
 
@@ -627,5 +603,156 @@ namespace FindReplace
                 commandBindings.Add(new CommandBinding(SearchCommands.FindPrevious, ExecuteFindPrevious, CanExecuteWithOpenSearchPanel));
             }
         }
+    }
+
+    /// <summary>
+    /// EventArgs for <see cref="SearchReplacePanel.SearchOptionsChanged"/> event.
+    /// </summary>
+    public class SearchOptionsChangedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the search pattern.
+        /// </summary>
+        public string SearchPattern { get; private set; }
+
+        /// <summary>
+        /// Gets whether the search pattern should be interpreted case-sensitive.
+        /// </summary>
+        public bool MatchCase { get; private set; }
+
+        /// <summary>
+        /// Gets whether the search pattern should be interpreted as regular expression.
+        /// </summary>
+        public bool UseRegex { get; private set; }
+
+        /// <summary>
+        /// Gets whether the search pattern should only match whole words.
+        /// </summary>
+        public bool WholeWords { get; private set; }
+
+        /// <summary>
+        /// Creates a new SearchOptionsChangedEventArgs instance.
+        /// </summary>
+        public SearchOptionsChangedEventArgs(string searchPattern, bool matchCase, bool useRegex, bool wholeWords)
+        {
+            SearchPattern = searchPattern;
+            MatchCase = matchCase;
+            UseRegex = useRegex;
+            WholeWords = wholeWords;
+        }
+    }
+
+    class SearchReplacePanelAdorner : Adorner
+    {
+        private SearchReplacePanel _panel;
+
+        public SearchReplacePanelAdorner(TextArea textArea, SearchReplacePanel panel)
+            : base(textArea)
+        {
+            _panel = panel;
+            AddVisualChild(panel);
+        }
+
+        protected override int VisualChildrenCount
+        {
+            get { return 1; }
+        }
+
+        protected override Visual GetVisualChild(int index)
+        {
+            if (index != 0)
+                throw new ArgumentOutOfRangeException();
+            return _panel;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            _panel.Arrange(new Rect(new Point(0, 0), finalSize));
+            return new Size(_panel.ActualWidth, _panel.ActualHeight);
+        }
+    }
+
+    class SearchReplaceResultBackgroundRenderer : IBackgroundRenderer
+    {
+        private Brush _markerBrush;
+        private Pen _markerPen;
+
+        public TextSegmentCollection<TextSegment> CurrentResults { get; } = new TextSegmentCollection<TextSegment>();
+
+        public KnownLayer Layer
+        {
+            get
+            {
+                // draw behind selection
+                return KnownLayer.Selection;
+            }
+        }
+
+        public SearchReplaceResultBackgroundRenderer()
+        {
+            _markerBrush = Brushes.LightGreen;
+            _markerPen = new Pen(_markerBrush, 1);
+        }
+
+        public Brush MarkerBrush
+        {
+            get { return _markerBrush; }
+            set
+            {
+                _markerBrush = value;
+                _markerPen = new Pen(_markerBrush, 1);
+            }
+        }
+
+        public void Draw(TextView textView, DrawingContext drawingContext)
+        {
+            if (textView == null)
+                throw new ArgumentNullException("textView");
+            if (drawingContext == null)
+                throw new ArgumentNullException("drawingContext");
+
+            if (CurrentResults == null || !textView.VisualLinesValid)
+                return;
+
+            var visualLines = textView.VisualLines;
+            if (visualLines.Count == 0)
+                return;
+
+            var viewStart = visualLines.First().FirstDocumentLine.Offset;
+            var viewEnd = visualLines.Last().LastDocumentLine.EndOffset;
+
+            foreach (var result in CurrentResults.FindOverlappingSegments(viewStart, viewEnd - viewStart))
+            {
+                var geoBuilder = new BackgroundGeometryBuilder
+                {
+                    //BorderThickness = markerPen != null ? markerPen.Thickness : 0,
+                    AlignToWholePixels = true,
+                    CornerRadius = 3
+                };
+                geoBuilder.AddSegment(textView, result);
+                var geometry = geoBuilder.CreateGeometry();
+                if (geometry != null)
+                {
+                    drawingContext.DrawGeometry(_markerBrush, _markerPen, geometry);
+                }
+            }
+        }
+    }
+
+    public static class SearchCommandsEx
+    {
+        /// <summary>Replaces the next occurrence in the document.</summary>
+        public static readonly RoutedCommand ReplaceNext = new RoutedCommand("ReplaceNext", typeof(SearchReplacePanel),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.R, ModifierKeys.Alt)
+            });
+
+        /// <summary>Replaces all the occurrences in the document.</summary>
+        public static readonly RoutedCommand ReplaceAll = new RoutedCommand("ReplaceAll", typeof(SearchReplacePanel),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Alt)
+            });
     }
 }

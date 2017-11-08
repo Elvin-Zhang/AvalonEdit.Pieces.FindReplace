@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindReplace", "FindReplace\FindReplace.csproj", "{DD3F3477-2CB4-4FE7-A9C4-88D9E631D047}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindReplace", "FindReplace\FindReplace.csproj", "{DD3F3477-2CB4-4FE7-A9C4-88D9E631D047}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindReplaceTesting", "FindReplaceTesting\FindReplaceTesting.csproj", "{853C846D-4F3F-4088-856C-445818EB4841}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindReplaceTesting", "FindReplaceTesting\FindReplaceTesting.csproj", "{853C846D-4F3F-4088-856C-445818EB4841}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -23,6 +23,16 @@
 
 
   <ItemGroup>
+    <Page Remove="Themes\Generic.xaml" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Themes\Generic.xaml" />
+  </ItemGroup>
+
+
+  <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="5.0.4" />
   </ItemGroup>
 

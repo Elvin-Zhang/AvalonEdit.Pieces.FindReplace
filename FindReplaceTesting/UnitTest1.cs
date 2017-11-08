@@ -26,27 +26,6 @@ namespace FindReplaceTesting
 
 
         [TestMethod]
-        public async Task TestOverlayButton()
-        {
-            var result = await wpfTestUtil.Utility.runWithUIThread(new wpfTestUtil.RunOnUIArgs
-            {
-                RunAfterWindowAvailable = (win, host) =>
-                {
-                    var editor = host.GetTextEditor();
-                    var adorner1 = new FindReplace.GenericControlAdorner(editor.TextArea)
-                    {
-                        Child = new Button { Content = "Hello World!" }
-                    };
-
-                    AdornerLayer.GetAdornerLayer(editor.TextArea).Add(adorner1);
-                }
-            });
-
-            Assert.IsFalse(result.IsError, $"Exception occured: {result.ex}");
-        }
-
-
-        [TestMethod]
         public async Task TestSearchReplacePanel()
         {
             var result = await wpfTestUtil.Utility.runWithUIThread(new wpfTestUtil.RunOnUIArgs
