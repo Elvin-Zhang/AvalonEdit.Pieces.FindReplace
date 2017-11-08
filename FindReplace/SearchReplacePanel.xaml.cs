@@ -433,38 +433,10 @@ namespace FindReplace
         {
             if (!IsClosed) return;
 
-            /*
-            var testWin1 = new Window();
-            testWin1.Height = 300;
-            testWin1.Width = 300;
-            testWin1.Content = new SearchReplacePanel(this._textArea);
-            testWin1.ShowDialog();
-            */
             var layer = AdornerLayer.GetAdornerLayer(_textArea);
             if (layer != null)
             {
                 layer.Add(_adorner);
-                // try a different test too
-                var adorner2 = new GenericControlAdorner(_textArea)
-                {
-                    Child = new Button
-                    {
-                        Content = "Hello World"
-                    }
-                };
-                layer.Add(adorner2);
-                /*
-                var adorner3 = new GenericControlAdorner(_textArea)
-                {
-                    Child = new test.TestControl1()
-                };
-                layer.Add(adorner3);*/
-
-                var adorner4 = new GenericControlAdorner(_textArea)
-                {
-                    Child = new SearchReplacePanel(_textArea)
-                };
-                layer.Add(adorner4);
             }
                 
             _textArea.TextView.BackgroundRenderers.Add(_renderer);

@@ -44,5 +44,22 @@ namespace FindReplaceTesting
 
             Assert.IsFalse(result.IsError, $"Exception occured: {result.ex}");
         }
+
+
+        [TestMethod]
+        public async Task TestSearchReplacePanel()
+        {
+            var result = await wpfTestUtil.Utility.runWithUIThread(new wpfTestUtil.RunOnUIArgs
+            {
+                RunAfterWindowAvailable = (win, host) =>
+                {
+                    var editor = host.GetTextEditor();
+
+                    FindReplace.SearchReplacePanel.Install(editor);
+                }
+            });
+
+            Assert.IsFalse(result.IsError, $"Exception occured: {result.ex}");
+        }
     }
 }
