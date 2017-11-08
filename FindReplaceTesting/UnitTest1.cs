@@ -3,43 +3,46 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Threading.Tasks;
+using System.Threading;
+using ICSharpCode.AvalonEdit;
 
 namespace FindReplaceTesting
 {
     [TestClass]
     public class UnitTest1
     {
-        private (Window win, AvalonTestPieces.TestHost host) SetupHost()
-        {
-            var host = new AvalonTestPieces.TestHost();
-            var win = new Window();
-            win.Content = host;
 
-            return (win, host);
+
+
+        [TestMethod]
+        public async Task TestMethod1()
+        {
+            var result = await wpfTestUtil.Utility.runWithUIThread();
+
+            Assert.IsFalse(result.IsError, $"Exception occured: {result.ex}");
         }
 
 
         [TestMethod]
-        public void TestMethod1()
+        public async Task TestOverlayButton()
         {
-            var result = SetupHost();
-            result.win.ShowDialog();
-        }
-
-
-        [TestMethod]
-        public void TestOverlayButton()
-        {
-            var result = SetupHost();
-            var editor = result.host.GetTextEditor();
-
-            var adorner1 = new FindReplace.GenericControlAdorner(editor.TextArea)
+            var result = await wpfTestUtil.Utility.runWithUIThread(new wpfTestUtil.RunOnUIArgs
             {
-                Child = new Button { Content = "Hello World!" }
-            };
+                RunAfterWindowAvailable = (win, host) =>
+                {
+                    var editor = host.GetTextEditor();
+                    var adorner1 = new FindReplace.GenericControlAdorner(editor.TextArea)
+                    {
+                        Child = new Button { Content = "Hello World!" }
+                    };
 
+                    AdornerLayer.GetAdornerLayer(editor.TextArea).Add(adorner1);
+                }
+            });
 
-            result.win.ShowDialog();
+            Assert.IsFalse(result.IsError, $"Exception occured: {result.ex}");
         }
     }
 }
